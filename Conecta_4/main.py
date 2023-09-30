@@ -1,5 +1,5 @@
 from connect4 import *
-
+import time
 
 def main():
     g = Game()
@@ -8,6 +8,8 @@ def main():
     jugador_2 = g.jugadores[1]
 
     estadisticas = [0, 0, 0]
+
+    inicio_tiempo = time.time()
 
     done = False
 
@@ -31,6 +33,8 @@ def main():
             estadisticas[1] += 1
 
         print_stats(jugador_1, jugador_2, estadisticas)
+        tiempo_total = time.time() - inicio_tiempo
+        print(f"Tiempo total de juego: {tiempo_total} segundos")
 
         while True:
             reiniciar_juego = input("Desea jugar nuevamente? Si / No: ")
@@ -38,6 +42,8 @@ def main():
             if reiniciar_juego.lower() == 's' or reiniciar_juego.lower() == 'si':
                 g.nuevo_juego()
                 g.mostrar_estado()
+                # reiniciar el tiempo
+                inicio_tiempo = time.time()
                 break
             elif reiniciar_juego.lower() == 'n' or reiniciar_juego.lower() == 'no':
                 print("Entendido, gracias por jugar!")
