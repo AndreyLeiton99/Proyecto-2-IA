@@ -1,6 +1,7 @@
 import random
 import os
 from minimax import Minimax
+from alphaBeta import AlphaBeta
 
 
 class Game:
@@ -9,8 +10,9 @@ class Game:
         self.finished = False
         self.winner = None
 
+        # para limpiar la consola
         os.system('cls' if os.name == 'nt' else 'clear')
-        print("Welcome to Connect 4™!")
+        print("Bienvenido a Conecta 4!")
         self.players = [None, None]
         self.colors = ["x", "o"]
         self.setup_players()
@@ -21,19 +23,28 @@ class Game:
     def setup_players(self):
         for i in range(2):
             while self.players[i] is None:
-                choice = input(f"Should Player {i + 1} be a Human or a Computer? (H/C): ")
-                if choice.lower() == "human" or choice.lower() == "h":
-                    name = input(f"What is Player {i + 1}'s name? ")
+                choice = input(f"Indique si el Jugador {i + 1} va a ser Humano o IA? (H/IA): ")
+                if choice.lower() == "humano" or choice.lower() == "h":
+                    name = input(f"Digite el nombre del Jugador {i + 1} ")
                     self.players[i] = Player(name, self.colors[i])
-                elif choice.lower() == "computer" or choice.lower() == "c":
-                    name = input(f"What is Player {i + 1}'s name? ")
-                    difficulty = int(input("Enter difficulty for this AI (1 - 4): "))
-                    self.players[i] = AIPlayer(name, self.colors[i], difficulty + 1)
+                elif choice.lower() == "ia" or choice.lower() == "i":
+                    name = input(f"Digite el nombre del Jugador {i + 1} ")
+                    difficulty = int(input("Seleccione la dificultad para esta IA (1 - 4): "))
+
+                    opc = None
+                    right = False
+                    while right:
+                        opc = int(input("Ahora seleccione el algoritmo que desea utilizar: \n1- Minimax \n2- Alpha-Beta"
+                                        "\n ->"))
+                        right = True if opc == 1 or opc == 2 else False
+
+                    algorithm = "minimax" if opc == 1 else "alpha"
+                    self.players[i] = AIPlayer(name, self.colors[i], algorithm, difficulty + 1)
                 else:
                     print("Invalid choice, please try again.")
 
-        print(f"{self.players[0].name} will be {self.colors[0]}")
-        print(f"{self.players[1].name} will be {self.colors[1]}")
+        print(f"{self.players[0].name} va a ser {self.colors[0]}")
+        print(f"{self.players[1].name} va a ser {self.colors[1]}")
 
     def new_game(self):
         self.round = 1
@@ -62,7 +73,7 @@ class Game:
                 self.print_state()
                 return
 
-        print("Invalid move (column is full)")
+        print("Movimiento no permitido, la columna se encuentra llena")
 
     def check_for_fours(self):
         for i in range(6):
@@ -182,11 +193,11 @@ class Game:
                 for i in range(4):
                     self.board[row - i][col + i] = self.board[row - i][col + i].upper()
         else:
-            print("Error - Cannot enunciate four-of-a-kind")
+            print("Error - No se pudo encontrar un Conecta 4")
 
     def print_state(self):
         os.system('cls' if os.name == 'nt' else 'clear')
-        print("Connect 4™!")
+        print("Conecta 4™!")
         print("Round:", self.round)
         for i in range(5, -1, -1):
             print("\t", end="")
@@ -198,9 +209,9 @@ class Game:
         if self.finished:
             print("Game Over!")
             if self.winner is not None:
-                print(f"{self.winner.name} is the winner")
+                print(f"{self.winner.name} es el ganador")
             else:
-                print("Game was a draw")
+                print("El juego termina con EMPATE")
 
 
 class Player:
@@ -213,23 +224,34 @@ class Player:
         column = None
         while column is None:
             try:
-                choice = int(input("Enter a move (by column number): ")) - 1
+                choice = int(input("Digite el movimiento (por numero de columna): ")) - 1
             except ValueError:
                 choice = None
             if 0 <= choice <= 6:
                 column = choice
             else:
-                print("Invalid choice, try again")
+                print("Columna no existente, digite de nuevo!")
         return column
 
 
 class AIPlayer(Player):
-    def __init__(self, name, color, difficulty=5):
+    def __init__(self, name, color, algorithm, difficulty=5):
         super().__init__(name, color)
         self.difficulty = difficulty
+        self.algorithm = algorithm
 
     def move(self, state):
-        print(f"{self.name}'s turn. {self.name} is {self.color}")
-        m = Minimax(state)
-        best_move, _ = m.best_move(self.difficulty, state, self.color)
-        return best_move
+        print(f"Es el turno de {self.name}. {self.name} es {self.color}")
+
+        match self.algorithm:
+            case "minimax":
+                m = Minimax(state)
+                best_move, _ = m.best_move(self.difficulty, state, self.color)
+                return best_move
+            case "alpha":
+                a = AlphaBeta(state)
+                best_move, _ = a.best_move(self.difficulty, state, self.color, alpha=float('-inf'), beta=float(
+                    'inf'))  # alpha y beta se inicializan con esos valores por defecto
+                return best_move
+            case _:
+                print("Algoritmo desconocido, hay problemas.")
