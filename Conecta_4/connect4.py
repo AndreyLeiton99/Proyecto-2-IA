@@ -24,31 +24,45 @@ class Game:
     def setup_jugadores(self):
         for i in range(2):
             while self.jugadores[i] is None:
-                eleccion = input(
-                    f"Indique si el Jugador {i + 1} va a ser Humano o IA? (H/IA): ")
+                eleccion = input(f"Indique si el Jugador {i + 1} va a ser Humano o IA? (H/IA): ")
                 if eleccion.lower() == "humano" or eleccion.lower() == "h":
-                    nombre = input(f"Digite el nombre del Jugador {i + 1} ")
+                    nombre = input(f"Digite el nombre del Jugador {i + 1}: ")
                     self.jugadores[i] = Player(nombre, self.fichas[i])
                 elif eleccion.lower() == "ia" or eleccion.lower() == "i":
-                    nombre = input(f"Digite el nombre del Jugador {i + 1} ")
-                    dificultad = int(
-                        input("Seleccione la dificultad para esta IA (1 - 4): "))
+                    nombre = input(f"Digite el nombre del Jugador {i + 1}: ")
+
+                    while True:
+                        try:
+                            dificultad = int(input("Seleccione la dificultad para esta IA (1 - 4): "))
+                            if 1 <= dificultad <= 4:
+                                break
+                            else:
+                                raise ValueError("La dificultad debe estar entre 1 y 4")
+                        except ValueError as e:
+                            print(f"Error: {e}, debe usar solo numeros!!!!\n")
 
                     opc = None
                     right = False
                     while not right:
-                        opc = int(input("Ahora seleccione el algoritmo que desea utilizar: \n1- Minimax \n2- Alpha-Beta"
-                                        "\n ->"))
-                        right = True if opc == 1 or opc == 2 else False
+                        try:
+                            opc = int(input("Ahora seleccione el algoritmo que desea utilizar: \n1- Minimax \n2- "
+                                            "Alpha-Beta"
+                                            "\n -> "))
+                            if opc in [1, 2]:
+                                right = True
+                            else:
+                                print("Debe elegir entre el 1 y 2, intente de nuevo!\n")
+                        except ValueError as e:
+                            print("Se deben usar solamente numeros!!!")
 
                     algoritmo = "minimax" if opc == 1 else "alpha"
                     self.jugadores[i] = AIPlayer(
                         nombre, self.fichas[i], algoritmo, dificultad + 1)
                 else:
-                    print("Invalid choice, please try again.")
+                    print("Opcion incorrecta.")
 
-        print(f"{self.jugadores[0].nombre} va a ser {self.fichas[0]}")
-        print(f"{self.jugadores[1].nombre} va a ser {self.fichas[1]}")
+        print(f"{self.jugadores[0].nombre} va a ser la ficha {self.fichas[0]}")
+        print(f"{self.jugadores[1].nombre} va a ser la ficha {self.fichas[1]}")
 
     def nuevo_juego(self):
         self.ronda = 1
@@ -112,7 +126,6 @@ class Game:
         count = 0
         slope = None
 
-        # check for diagonals with positive slope
         consecutive_count = 0
         j = col
         for i in range(row, 6):
@@ -122,7 +135,7 @@ class Game:
                 consecutive_count += 1
             else:
                 break
-            j += 1  # increment column when row is incremented
+            j += 1
 
         if consecutive_count >= 4:
             count += 1
@@ -132,7 +145,6 @@ class Game:
             else:
                 self.Ganador = self.jugadores[1]
 
-        # check for diagonals with negative slope
         consecutive_count = 0
         j = col
         for i in range(row, -1, -1):
@@ -142,7 +154,7 @@ class Game:
                 consecutive_count += 1
             else:
                 break
-            j += 1  # increment column when row is decremented
+            j += 1
 
         if consecutive_count >= 4:
             count += 1
@@ -207,11 +219,11 @@ class Game:
         codigo_rojo = "\033[1;31;40m"
         codigo_verde = "\033[1;32;40m"
         codigo_azul_negrita = "\033[1;34;40m"
-        reset_color = "\033[0m"  # Restablece el ficha a su valor predeterminado
+        reset_color = "\033[0m"  # Restablece el ficha a su valor por defecto
 
         os.system('cls' if os.name == 'nt' else 'clear')
-        print("Conecta 4™!")
-        print("Round:", self.ronda)
+        print("Conecta 4!")
+        print("Ronda:", self.ronda)
         for i in range(5, -1, -1):
             print("\t", end="")
             for j in range(7):
@@ -238,7 +250,6 @@ class Game:
                 print(f"{self.Ganador.nombre} es el ganador")
             else:
                 print("El juego termina con EMPATE")
-
 
 
 class Player:

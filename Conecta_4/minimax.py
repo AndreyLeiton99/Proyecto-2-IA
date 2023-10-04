@@ -114,9 +114,3 @@ class Minimax:
             i += row_step
             j += col_step
         return 1 if consecutive_count >= streak else 0
-
-# Example usage:
-# board = [[' ' for _ in range(7)] for _ in range(6)]
-# minimax = Minimax(board)
-# best_move, best_alpha = minimax.best_move(5, board, 'x')
-# print(f"Best Move: {best_move}, Best Alpha: {best_alpha}")

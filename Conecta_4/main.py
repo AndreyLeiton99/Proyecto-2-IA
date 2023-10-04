@@ -1,6 +1,7 @@
 from connect4 import *
 import time
 
+
 def main():
     g = Game()
     g.mostrar_estado()
