@@ -1,0 +1,2 @@
+experta
+frozendict>=2.1.0
